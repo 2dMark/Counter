@@ -7,18 +7,24 @@ public class Counter : MonoBehaviour
     [SerializeField, Min(.1f)] private float _timeInterval = .5f;
     [SerializeField, Min(.1f)] private float _summand = 1f;
 
-    public event Action<float> CountChanged;
-
     private WaitForSeconds _timer;
     private Coroutine _coroutine;
     private float _count;
     private bool _isWork = false;
+
+    public event Action<float> CountChanged;
 
     public bool IsWork => _isWork;
 
     private void Awake()
     {
         _timer = new(_timeInterval);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            ChangeWorkStatus();
     }
 
     public void StartCounting()
@@ -31,7 +37,19 @@ public class Counter : MonoBehaviour
         _coroutine = StartCoroutine(Counting());
     }
 
-    public void StopCounting() => _isWork = false;
+    public void StopCounting()
+    {
+        _isWork = false;
+        _coroutine = null;
+    }
+
+    private void ChangeWorkStatus()
+    {
+        if (IsWork)
+            StopCounting();
+        else
+            StartCounting();
+    }
 
     private IEnumerator Counting()
     {
@@ -42,7 +60,5 @@ public class Counter : MonoBehaviour
 
             yield return _timer;
         }
-
-        yield return null;
     }
 }
